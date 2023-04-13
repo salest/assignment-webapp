@@ -38,7 +38,7 @@ If you run the project, you'll see test data as json string at https://localhost
 
 
 
-# (Backend) ChartJs Example project with Blazor
+# (Backend) Firebase functions project
 
 ## Overview  
 This project is an example implementation using firebase functions in typescript
@@ -50,10 +50,18 @@ This project is an example implementation using firebase functions in typescript
 ## How to try  
 (We assume you have already set up firebase CLI. If not check https://firebase.google.com/docs/cli)  
 Build and run project:  
-- inside functions folder run npm run build & firebase emulators:start to test in emulator environment
+- inside functions folder run `npm run build` & `firebase emulators:start` to test in emulator environment
 
-## Assgingment  
+Note: no need to deploy. Just run locally using firebase emulator is fine
 
+## Assigngment  
+Task: Create functions which allow following behaviours
+- store robot maintenance report data
+- get maintenance data of specified store
+- update specified amount of time to WorkTime.Maintenance for a specific store
+- get maintenance data for a specified data range
+
+Note: you can find the initial data to load in firestore under `ChartJsExample/wwwroot/sample-data/reports.json`
 
 ## Notes:  
 - If you have any question to proceed the assignment, feel free to ask on slack  
