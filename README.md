@@ -1,4 +1,4 @@
-# (FrontEnd) ChartJs Example project with Blazor
+# (Frontend) ChartJs Example project with Blazor
 
 ## Overview  
 This project is an example implementation using .NET Blazor Web Assemble + ChartJs
