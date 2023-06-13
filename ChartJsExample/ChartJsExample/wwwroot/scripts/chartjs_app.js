@@ -1,10 +1,17 @@
-export async function draw() {
+export async function draw(reports) {
     // and just rendering very simple chart according to tutorial page: https://www.chartjs.org/docs/latest/getting-started/usage.html
     const ctx = document.getElementById('chartCanvas');
+
+    const dates = reports.map((r) => {
+        const date = new Date(r["workDate"]);
+        
+        return date.toLocaleDateString('en-GB');
+    });
+
     window.myChart = new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+            labels: dates,
             datasets: [{
                 label: '# of Votes',
                 data: [12, 19, 3, 5, 2, 3],
@@ -36,3 +43,14 @@ export async function draw() {
         }
     });
 };
+
+function convertDate(date) {
+    var yyyy = date.getFullYear().toString();
+    var mm = (date.getMonth() + 1).toString();
+    var dd = date.getDate().toString();
+
+    var mmChars = mm.split('');
+    var ddChars = dd.split('');
+
+    return yyyy + '-' + (mmChars[1] ? mm : "0" + mmChars[0]) + '-' + (ddChars[1] ? dd : "0" + ddChars[0]);
+}
