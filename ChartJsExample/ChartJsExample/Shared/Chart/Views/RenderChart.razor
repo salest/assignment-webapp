@@ -61,7 +61,7 @@
         }
     }
     //Filters reports and returns IEnumerable within a specified startDate and endDate
-    private IEnumerable<Report> FilterReports(Report[] reports, DateTime startDate, DateTime endDate)
+    public IEnumerable<Report> FilterReports(Report[] reports, DateTime startDate, DateTime endDate)
     {
         return reports.Where(r => r.WorkDate >= startDate && r.WorkDate <= endDate);
     }
