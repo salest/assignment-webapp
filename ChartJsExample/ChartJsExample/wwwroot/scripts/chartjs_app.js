@@ -1,10 +1,19 @@
 export async function draw(reports, startDate, endDate) {
     // and just rendering very simple chart according to tutorial page: https://www.chartjs.org/docs/latest/getting-started/usage.html
     const ctx = document.getElementById('chartCanvas');
+
+    //Data set to hold the dates and maintenance minutes
     const dataSet = {};
 
- 
-
+    //Creates start/end dates and creates key/value pair for each date within the range
+    let start = new Date(startDate);
+    let end = new Date(endDate);
+    for (let i = start; i < end; start.setDate(start.getDate() + 1)) {
+        const formattedDate = i.toLocaleDateString('en-GB');
+        console.log(formattedDate);
+        dataSet[formattedDate] = 0;
+    }
+    //Updates the maintenance numbers for dates within range
     reports.map((r) => {
         //Get the date from reports object
         const date = new Date(r["workDate"]);
@@ -61,24 +70,6 @@ export async function draw(reports, startDate, endDate) {
 };
 
 export async function update(reports, startDate, endDate) {
-    const ctx = document.getElementById('chartCanvas');
-    const dataSet = {};
-
-    reports.map((r) => {
-        const date = new Date(r["workDate"]);
-        const maintenance = r["workTime"]["maintenance"];
-        const formattedDate = date.toLocaleDateString('en-GB');
-        if (dataSet[formattedDate]) {
-            dataSet[formattedDate] += maintenance
-        }
-        else {
-            dataSet[formattedDate] = maintenance;
-        }
-    });
-
-    console.log(startDate);
-    console.log(endDate);
-
     window.myChart.destroy();
     draw(reports, startDate, endDate);
 };
