@@ -13,7 +13,7 @@
                    value=@today
                    @onchange="(e) => UpdateChart(e)"
                    min="2018-01-01" 
-                   max=@today>
+                   >
         </div>
     </div>
 
@@ -28,8 +28,8 @@
     string TestDataJson = string.Empty;
     Report[] reports = Array.Empty<Report>();
 
-    string today = DateTime.Today.ToString("yyyy-MM-dd");
-    DateTime selectedDate = DateTime.Today;
+    //Place holder for datepicker
+    string today = "";
 
     protected override async Task OnInitializedAsync()
     {
@@ -38,9 +38,10 @@
 
         //Get Latest Date from the reports
         DateTime latestRecordDate = reports.Max(r => r.WorkDate);
-        DateTime previousWeek = latestRecordDate.AddDays(-7);
+        today = latestRecordDate.ToString("yyyy-MM-dd");
+        DateTime previousWeek = latestRecordDate.AddDays(-6);
         //Filter reports for the range of last recorded data and the past 7 days
-        IEnumerable<Report> filteredReports = reports.Where(r => r.WorkDate >= previousWeek && r.WorkDate <= latestRecordDate);
+        IEnumerable<Report> filteredReports = FilterReports(reports, previousWeek, latestRecordDate);
         //Draw the chart
         await chartJsInterop.Draw(filteredReports, previousWeek, latestRecordDate);
         await InvokeAsync(StateHasChanged);
@@ -53,10 +54,15 @@
         {
             string dateString = e.Value.ToString();
             DateTime selectedDate = DateTime.Parse(dateString);
-            DateTime previousWeek = selectedDate.AddDays(-7);
-            IEnumerable<Report> reportsToShow = reports.Where(r => r.WorkDate >= previousWeek && r.WorkDate <= selectedDate);
+            DateTime previousWeek = selectedDate.AddDays(-6);
+            IEnumerable<Report> reportsToShow = FilterReports(reports, previousWeek, selectedDate);
             await chartJsInterop.UpdateChart(reportsToShow, previousWeek, selectedDate);
             await InvokeAsync(StateHasChanged);
         }
+    }
+    //Filters reports and returns IEnumerable within a specified startDate and endDate
+    private IEnumerable<Report> FilterReports(Report[] reports, DateTime startDate, DateTime endDate)
+    {
+        return reports.Where(r => r.WorkDate >= startDate && r.WorkDate <= endDate);
     }
 }
