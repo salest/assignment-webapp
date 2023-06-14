@@ -7,6 +7,13 @@
         <h4>Test chart:</h4>
         <div style="width:75%;">
             <canvas id="chartCanvas"></canvas>
+            <label for="latest-date">Latest date:</label>
+
+            <input type="date" id="latest-date" name="date-end" 
+                   value=@today
+                   @onchange="(e) => UpdateChart(e)"
+                   min="2018-01-01" 
+                   max=@today>
         </div>
     </div>
 
@@ -21,11 +28,35 @@
     string TestDataJson = string.Empty;
     Report[] reports = Array.Empty<Report>();
 
+    string today = DateTime.Today.ToString("yyyy-MM-dd");
+    DateTime selectedDate = DateTime.Today;
+
     protected override async Task OnInitializedAsync()
     {
         reports = await dataGateway.LoadReports();
         TestDataJson = System.Text.RegularExpressions.Regex.Unescape(System.Text.Json.JsonSerializer.Serialize(reports));
-        await chartJsInterop.Draw(reports);
+
+        //Get Latest Date from the reports
+        DateTime latestRecordDate = reports.Max(r => r.WorkDate);
+        DateTime previousWeek = latestRecordDate.AddDays(-7);
+        //Filter reports for the range of last recorded data and the past 7 days
+        IEnumerable<Report> filteredReports = reports.Where(r => r.WorkDate >= previousWeek && r.WorkDate <= latestRecordDate);
+        //Draw the chart
+        await chartJsInterop.Draw(filteredReports, previousWeek, latestRecordDate);
         await InvokeAsync(StateHasChanged);
+    }
+
+    //Update the chart when a new date is selected
+    async Task UpdateChart(ChangeEventArgs e)
+    {
+        if(e != null)
+        {
+            string dateString = e.Value.ToString();
+            DateTime selectedDate = DateTime.Parse(dateString);
+            DateTime previousWeek = selectedDate.AddDays(-7);
+            IEnumerable<Report> reportsToShow = reports.Where(r => r.WorkDate >= previousWeek && r.WorkDate <= selectedDate);
+            await chartJsInterop.UpdateChart(reportsToShow, previousWeek, selectedDate);
+            await InvokeAsync(StateHasChanged);
+        }
     }
 }

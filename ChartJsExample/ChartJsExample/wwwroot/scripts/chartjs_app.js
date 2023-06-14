@@ -1,20 +1,36 @@
-export async function draw(reports) {
+export async function draw(reports, startDate, endDate) {
     // and just rendering very simple chart according to tutorial page: https://www.chartjs.org/docs/latest/getting-started/usage.html
     const ctx = document.getElementById('chartCanvas');
+    const dataSet = {};
 
-    const dates = reports.map((r) => {
+ 
+
+    reports.map((r) => {
+        //Get the date from reports object
         const date = new Date(r["workDate"]);
-        
-        return date.toLocaleDateString('en-GB');
+        //Get maintenance minutes from report object
+        const maintenance = r["workTime"]["maintenance"];
+        //Convert date time string to yyyy-mm-dd format
+        const formattedDate = date.toLocaleDateString('en-GB');
+        //Combine maintenance minutes if multiple visits happen on the same day
+        if (dataSet[formattedDate]) {
+            dataSet[formattedDate] += maintenance
+        }
+        else {
+            dataSet[formattedDate] = maintenance;
+        }
     });
-
+    //Create chart
     window.myChart = new Chart(ctx, {
-        type: 'bar',
+        type: 'line',
         data: {
-            labels: dates,
+            //Gets the dates from the dataSet and sets as label
+            labels: Object.keys(dataSet),
             datasets: [{
-                label: '# of Votes',
-                data: [12, 19, 3, 5, 2, 3],
+                //Updates Vertical Axis label
+                label: '# of minutes for maintenance',
+                //Plots the data points of the maintenance minutes
+                data: Object.values(dataSet),
                 backgroundColor: [
                     'rgba(255, 99, 132, 0.2)',
                     'rgba(54, 162, 235, 0.2)',
@@ -44,13 +60,25 @@ export async function draw(reports) {
     });
 };
 
-function convertDate(date) {
-    var yyyy = date.getFullYear().toString();
-    var mm = (date.getMonth() + 1).toString();
-    var dd = date.getDate().toString();
+export async function update(reports, startDate, endDate) {
+    const ctx = document.getElementById('chartCanvas');
+    const dataSet = {};
 
-    var mmChars = mm.split('');
-    var ddChars = dd.split('');
+    reports.map((r) => {
+        const date = new Date(r["workDate"]);
+        const maintenance = r["workTime"]["maintenance"];
+        const formattedDate = date.toLocaleDateString('en-GB');
+        if (dataSet[formattedDate]) {
+            dataSet[formattedDate] += maintenance
+        }
+        else {
+            dataSet[formattedDate] = maintenance;
+        }
+    });
 
-    return yyyy + '-' + (mmChars[1] ? mm : "0" + mmChars[0]) + '-' + (ddChars[1] ? dd : "0" + ddChars[0]);
-}
+    console.log(startDate);
+    console.log(endDate);
+
+    window.myChart.destroy();
+    draw(reports, startDate, endDate);
+};

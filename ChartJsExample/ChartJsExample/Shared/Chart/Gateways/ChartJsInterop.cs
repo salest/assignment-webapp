@@ -4,7 +4,8 @@ namespace Tx
     public interface IChartJsInterop
     {
         bool IsReady { get; }
-        Task Draw(Report[] reports);
+        Task Draw(IEnumerable<Report> reports, DateTime startDate, DateTime endDate);
+        Task UpdateChart(IEnumerable<Report> reports, DateTime startDate, DateTime endDate);
     }
 
     public class ChartJsInterop : IChartJsInterop
@@ -28,10 +29,17 @@ namespace Tx
         }
 
         public bool IsReady => _jsMod != null;
-        public async Task Draw(Report[] reports)
+        public async Task Draw(IEnumerable<Report> reports, DateTime startDate, DateTime endDate)
         {
             if(!await LoadModules()) { return; }
-            await _jsMod!.InvokeVoidAsync("draw", (object) reports);
+            await _jsMod!.InvokeVoidAsync("draw", (object) reports, startDate, endDate);
         }
+
+        public async Task UpdateChart(IEnumerable<Report> reports, DateTime startDate, DateTime endDate)
+        {
+            if (!await LoadModules()) { return; }
+            await _jsMod!.InvokeVoidAsync("update", (object)reports, startDate, endDate);
+        }
+
     }
 }
