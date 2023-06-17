@@ -1,6 +1,9 @@
 const axios = require('axios');
 
 const addSingleJsonObject = 'http://127.0.0.1:5001/assignmenttestproject-8d3dd/us-central1/saveMaintenanceDataToFirestore';
+const getStoreDataURL = 'http://127.0.0.1:5001/assignmenttestproject-8d3dd/us-central1/getSpecificStoreData';
+const getDataRangeTestURL = 'http://127.0.0.1:5001/assignmenttestproject-8d3dd/us-central1/getDataByDateRange';
+const patchTestURL = 'http://127.0.0.1:5001/assignmenttestproject-8d3dd/us-central1/updateDataByField';
 //Initial Data to load
 const data = [
     {
@@ -264,7 +267,44 @@ function loadInitialData() {
     });
 }
 
-loadInitialData();
+//Test case for getting a specific store data
+function getRequestTest(params, hasDates) {
+    //Axios get call 
+    //Choose Firebase function depending if we have dates or not
+    const url = hasDates ? getDataRangeTestURL : getStoreDataURL;
+    const dataArray = [];
+    return axios.get(url, { params })
+        .then(response => {
+            response.data.forEach((result) => {
+                // Process each result and add it to the dataArray
+                dataArray.push(result);
+            });
+            console.log(dataArray);
+            return dataArray;
+        })
+        .catch(error => {
+            console.error('Request failed:', error);
+        });
+}
+
+function patchRequestTest(params) {
+    return axios.patch(patchTestURL, { params })
+        .then(response => {
+            console.log('Request successful');
+            // console.log(response.data);
+        })
+        .catch(error => {
+            console.error('Error occurred');
+            console.error(error.response.data);
+        });
+}
+const params = {
+    ticketLink: 'https://telexistence.slack.com/archives/C02G5QTSP5H/p1664239630955079',
+    updatedMaintenance: 75
+}
+patchRequestTest(params);
+
+module.exports = { getRequestTest, patchRequestTest };
 
 
 

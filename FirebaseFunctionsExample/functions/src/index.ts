@@ -53,10 +53,10 @@ export const getSpecificStoreData = functions.https.onRequest(async (req, res) =
     //Field Name we are filtering on
     const fieldName = 'StoreName';
     //Grabs the field value from request query 
-    const fieldValue = req.query.fieldValue;
+    const storeName = req.query.storeName;
 
     //Queries the Firestore collection based on the field value
-    const querySnapshot = await admin.firestore().collection(COLLECTION_NAME).where(fieldName, '==', fieldValue).get();
+    const querySnapshot = await admin.firestore().collection(COLLECTION_NAME).where(fieldName, '==', storeName).get();
     //Grabs all the docs that were filtered and stores it into an object to pass back
     const data = querySnapshot.docs.map((doc) => doc.data());
     //Send the json data back
@@ -70,19 +70,19 @@ export const getSpecificStoreData = functions.https.onRequest(async (req, res) =
 export const updateDataByField = functions.https.onRequest(async (req, res) => {
   try {
     // Extract the field value from the request body
-    const fieldValue = req.body.fieldValue;
+    const ticketLink = req.query.ticketLink;
 
-    // Extract the updated data from the request body
-    const updatedData = req.body.updatedData;
+     // Extract the updated data from the request body
+     const updatedMaintenance = req.query.updatedMaintenance;
 
     // Query the Firestore collection based on the field value
-    const querySnapshot = await admin.firestore().collection(COLLECTION_NAME).where('StoreName', '==', fieldValue).get();
-
+    const querySnapshot = await admin.firestore().collection(COLLECTION_NAME).where('TicketLink', '==', ticketLink).get();
+    console.log(querySnapshot);
     // Update the documents with the updated data
     const batch = admin.firestore().batch();
     querySnapshot.forEach((doc) => {
       const docRef = doc.ref;
-      batch.update(docRef, updatedData);
+      batch.update(docRef, { 'WorkTime.Maintenance': updatedMaintenance });
     });
 
     // Commit the batch write
