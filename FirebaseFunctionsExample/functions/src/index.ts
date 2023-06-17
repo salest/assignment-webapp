@@ -95,7 +95,7 @@ export const updateDataByField = functions.https.onRequest(async (req, res) => {
   }
 });
 
-export const getObjectsByDateRange = functions.https.onRequest(async (request, response) => {
+export const getDataByDateRange = functions.https.onRequest(async (request, response) => {
   const startDate = request.query.startDate as string;
   const endDate = request.query.endDate as string;
   const storeName = request.query.storeName as string;
