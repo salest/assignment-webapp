@@ -1,9 +1,9 @@
 const axios = require('axios');
 
-const addSingleJsonObject = 'http://127.0.0.1:5001/assignmenttestproject-8d3dd/us-central1/saveMaintenanceDataToFirestore';
 const getStoreDataURL = 'http://127.0.0.1:5001/assignmenttestproject-8d3dd/us-central1/getSpecificStoreData';
 const getDataRangeTestURL = 'http://127.0.0.1:5001/assignmenttestproject-8d3dd/us-central1/getDataByDateRange';
 const patchTestURL = 'http://127.0.0.1:5001/assignmenttestproject-8d3dd/us-central1/updateDataByField';
+const clearCollectionURL = 'http://127.0.0.1:5001/assignmenttestproject-8d3dd/us-central1/clearCollection';
 //Initial Data to load
 const data = [
     {
@@ -256,6 +256,7 @@ const data = [
     }
 ]
 function loadInitialData() {
+    const addSingleJsonObject = 'http://127.0.0.1:5001/assignmenttestproject-8d3dd/us-central1/saveMaintenanceDataToFirestore';
     data.forEach(element => {
         axios.post(addSingleJsonObject, element)
             .then(response => {
@@ -288,23 +289,30 @@ function getRequestTest(params, hasDates) {
 }
 
 function patchRequestTest(params) {
-    return axios.patch(patchTestURL, { params })
+    return axios.patch(`${patchTestURL}?ticketLink=${params["ticketLink"]}&updatedMaintenance=${params["updatedMaintenance"]}`)
         .then(response => {
             console.log('Request successful');
-            // console.log(response.data);
+            return response.data;
         })
         .catch(error => {
             console.error('Error occurred');
             console.error(error.response.data);
         });
 }
-const params = {
-    ticketLink: 'https://telexistence.slack.com/archives/C02G5QTSP5H/p1664239630955079',
-    updatedMaintenance: 75
-}
-patchRequestTest(params);
 
-module.exports = { getRequestTest, patchRequestTest };
+function clearFirestore() {
+    return axios.get(clearCollectionURL)
+        .then(response => {
+            console.log('Collection cleared successfully');
+            return response.data;
+        })
+        .catch(error => {
+            console.error('Error clearing collection');
+            console.error(error.response.data);
+        });
+}
+
+module.exports = { loadInitialData, clearFirestore, getRequestTest, patchRequestTest };
 
 
 

@@ -24,7 +24,7 @@ export const addMessage = functions.https.onRequest(async (request, response) =>
   response.json({ result: `Message with ID: ${writeResult.id} added.` });
 });
 
-exports.saveMaintenanceDataToFirestore = functions.https.onRequest(async (req, res) => {
+export const saveMaintenanceDataToFirestore = functions.https.onRequest(async (req, res) => {
   try {
     console.log(req.body);
     // Get the data from the request body
@@ -72,8 +72,8 @@ export const updateDataByField = functions.https.onRequest(async (req, res) => {
     // Extract the field value from the request body
     const ticketLink = req.query.ticketLink;
 
-     // Extract the updated data from the request body
-     const updatedMaintenance = req.query.updatedMaintenance;
+    // Extract the updated data from the request body
+    const updatedMaintenance = req.query.updatedMaintenance;
 
     // Query the Firestore collection based on the field value
     const querySnapshot = await admin.firestore().collection(COLLECTION_NAME).where('TicketLink', '==', ticketLink).get();
@@ -90,6 +90,7 @@ export const updateDataByField = functions.https.onRequest(async (req, res) => {
 
     res.status(200).send('Data updated successfully');
   } catch (error) {
+    console.log(error);
     console.error('Error updating data:', error);
     res.status(500).send('Error updating data');
   }
@@ -107,7 +108,7 @@ export const getDataByDateRange = functions.https.onRequest(async (request, resp
       .get();
 
     const objects: any[] = [];
-    snapshot.forEach((doc) => { 
+    snapshot.forEach((doc) => {
       const data = doc.data();
       const workDateTimestamp = data.WorkDate.toDate();
       const updatedData = { ...data, WorkDate: workDateTimestamp };
@@ -121,6 +122,24 @@ export const getDataByDateRange = functions.https.onRequest(async (request, resp
   }
 });
 
+export const clearCollection = functions.https.onRequest(async (req, res) => {
+  try {
+    const batch = admin.firestore().batch();
+    const collectionRef = admin.firestore().collection(COLLECTION_NAME);
+
+    const snapshot = await collectionRef.get();
+    snapshot.forEach(doc => {
+      batch.delete(doc.ref);
+    });
+
+    await batch.commit();
+
+    res.status(200).send('Collection cleared successfully');
+  } catch (error) {
+    console.error('Error clearing collection:', error);
+    res.status(500).send('Error clearing collection');
+  }
+});
 
 
 

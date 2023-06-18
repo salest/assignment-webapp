@@ -1,5 +1,10 @@
 const requests = require('./index-requests');
 
+beforeAll(async () => {
+    await requests.clearFirestore();
+    await requests.loadInitialData();
+  });
+
 test('Searching コンビニマート 日本橋室町三井タワー店 yields 1 result', async () => {
     const params = {
         storeName: 'コンビニマート 日本橋室町三井タワー店'
@@ -19,10 +24,11 @@ test('Searching コンビニマート 日本橋室町三井タワー店 with dat
 });
 
 test('Update ticket from 50 maintenane to 75', async () => {
+
     const params = {
         ticketLink: 'https://telexistence.slack.com/archives/C02G5QTSP5H/p1664239630955079',
         updatedMaintenance: 75
     }
     const data = await requests.patchRequestTest(params);
-    
+    expect(data).toBe('Data updated successfully');
 });
