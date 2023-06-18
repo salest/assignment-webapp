@@ -96,11 +96,14 @@ export const updateDataByField = functions.https.onRequest(async (req, res) => {
   }
 });
 
+// Function to get data by date range passed into parameters GET Call
 export const getDataByDateRange = functions.https.onRequest(async (request, response) => {
+  //Grabs the start/end date and store name from GET Request
   const startDate = request.query.startDate as string;
   const endDate = request.query.endDate as string;
   const storeName = request.query.storeName as string;
   try {
+    //Creates the snapshot that filters the collection by the date range and store name
     const snapshot = await admin.firestore().collection(COLLECTION_NAME)
       .where('StoreName', '==', storeName)
       .where('WorkDate', '>=', new Date(startDate))
@@ -108,8 +111,10 @@ export const getDataByDateRange = functions.https.onRequest(async (request, resp
       .get();
 
     const objects: any[] = [];
+    //filters through the snapshot and adds it to the objects array
     snapshot.forEach((doc) => {
       const data = doc.data();
+      //Grabs the Timestamp field and changes it to a Javascript Date to work with
       const workDateTimestamp = data.WorkDate.toDate();
       const updatedData = { ...data, WorkDate: workDateTimestamp };
       objects.push(updatedData);
@@ -122,6 +127,7 @@ export const getDataByDateRange = functions.https.onRequest(async (request, resp
   }
 });
 
+//Clears the collection, we call this before initializing to ensure we don't re-input initial load
 export const clearCollection = functions.https.onRequest(async (req, res) => {
   try {
     const batch = admin.firestore().batch();
